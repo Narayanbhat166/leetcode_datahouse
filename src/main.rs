@@ -1,6 +1,8 @@
+use curl_parser::parse_curl;
 use reqwest::header::{self, HeaderMap, HeaderName, HeaderValue};
 use serde::{Deserialize, Serialize};
 mod scrape;
+mod curl_parser;
 
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -118,13 +120,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     headers.insert(header::REFERER, "https://leetcode.com".parse().unwrap());
     headers.insert(csrf_header, csrf_token.parse().unwrap());
 
-    let client = reqwest::Client::new();
-    let request = client.post(url).headers(headers).json(&body);
-    let resp = request.send().await?;
+    // let client = reqwest::Client::new();
+    // let request = client.post(url).headers(headers).json(&body);
+    // let resp = request.send().await?;
 
-    let parsed_resp = resp.json::<SubmissionResponse>().await?;
+    // let parsed_resp = resp.json::<SubmissionResponse>().await?;
 
-    println!("Response: {:?}", parsed_resp);
+    // println!("Response: {:?}", parsed_resp);
+    parse_curl();
     
     Ok(())
 }
