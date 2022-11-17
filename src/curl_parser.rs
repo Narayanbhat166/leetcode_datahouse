@@ -1,5 +1,5 @@
 use shellwords;
-use std::collections;
+use std::collections::{self, HashMap};
 use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
@@ -26,7 +26,7 @@ fn read_file(file_name: String) -> Result<String, Box<dyn Error>> {
     Ok(file_contents)
 }
 
-pub fn parse_curl() {
+pub fn parse_curl() -> HashMap<String, String> {
     let file_contents = read_file("src/curl_request.sh".to_string()).unwrap_or_default();
     let commands = shellwords::split(&file_contents[..]).unwrap();
     let args = commands
@@ -35,15 +35,17 @@ pub fn parse_curl() {
         .collect::<Vec<&String>>();
 
     let cookie = args.first().unwrap().splitn(2, ":").last().unwrap().trim();
-    let hm = cookie
+    let cookie_vector = cookie
         .split(";")
         .map(|ele| {
-            let res = ele.split("=").map(|ele| ele.trim())
-            collect::<Vec<&str>>();
+            let res = ele.split("=").map(|ele| ele.trim()).collect::<Vec<&str>>();
             let tuple = (res[0], res[1]);
             tuple
         })
         .collect::<Vec<(&str, &str)>>();
 
-    println!("{:?}", hm);
+    //FIXME: If possible avoid the clones
+    let hash_map: HashMap<String, String> = cookie_vector.into_iter().map(|ele| (ele.0.to_owned(), ele.1.to_owned())).collect();
+
+    hash_map
 }

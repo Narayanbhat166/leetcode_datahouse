@@ -1,2 +1,2 @@
 /target
-*curl_request.sh
+src/curl_request.sh
