@@ -1,7 +1,9 @@
+use shellwords;
+use std::collections;
+use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
-use std::error::Error;
 
 fn read_file(file_name: String) -> Result<String, Box<dyn Error>> {
     // Create a path to the desired file
@@ -24,12 +26,24 @@ fn read_file(file_name: String) -> Result<String, Box<dyn Error>> {
     Ok(file_contents)
 }
 
-pub fn parse_curl(){
+pub fn parse_curl() {
     let file_contents = read_file("src/curl_request.sh".to_string()).unwrap_or_default();
-    println!("Contents {}", file_contents);
-    let lines = file_contents.split("\\").collect::<Vec<&str>>();
+    let commands = shellwords::split(&file_contents[..]).unwrap();
+    let args = commands
+        .iter()
+        .filter(|argument| argument.contains("cookie"))
+        .collect::<Vec<&String>>();
 
-    println!("{:?}", lines.len());
+    let cookie = args.first().unwrap().splitn(2, ":").last().unwrap().trim();
+    let hm = cookie
+        .split(";")
+        .map(|ele| {
+            let res = ele.split("=").map(|ele| ele.trim())
+            collect::<Vec<&str>>();
+            let tuple = (res[0], res[1]);
+            tuple
+        })
+        .collect::<Vec<(&str, &str)>>();
 
-
+    println!("{:?}", hm);
 }
