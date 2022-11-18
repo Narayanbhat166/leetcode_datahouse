@@ -49,7 +49,4 @@ pub struct SubmissionResponse {
     data: Details,
 }
 
-
-pub fn get_submission(submission_id: String)  {
-    
-}
+pub fn get_submission(submission_id: String) {}

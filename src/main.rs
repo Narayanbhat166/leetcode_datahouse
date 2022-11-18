@@ -1,13 +1,11 @@
 use curl_parser::parse_curl;
 use reqwest::header::{self, HeaderMap, HeaderName, HeaderValue};
 use serde::{Deserialize, Serialize};
-mod scrape;
 mod curl_parser;
+mod scrape;
 
 const CSRF_COOKIE: &str = "csrftoken";
 const LEETCODE_SESSION_COOKIE: &str = "LEETCODE_SESSION";
-
-
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
