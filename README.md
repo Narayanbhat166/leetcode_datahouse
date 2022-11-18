@@ -7,6 +7,7 @@ This project gets the data from leetcode for data analysis. You can contribute t
 
 - [x] Scrape data
 - [x] Parse Curl
+- [ ] Architecture Diagram   
 - [ ] Producer and redis
 - [ ] Logs
 - [ ] A summary website
