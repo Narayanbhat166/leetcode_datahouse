@@ -1,24 +1,17 @@
 use shellwords;
 use std::collections::HashMap;
-use std::error::Error;
 use std::fs::File;
-use std::io::prelude::*;
+use std::io::{prelude::*, ErrorKind};
 use std::path::Path;
 
-fn read_file(file_name: String) -> Result<String, Box<dyn Error>> {
+fn read_file(file_name: String) -> Result<String, ErrorKind> {
     let path = Path::new(&file_name);
-    let display = path.display();
 
-    let mut file = match File::open(&path) {
-        Err(why) => Err(format!("couldn't open {}: {}", display, why))?,
-        Ok(file) => file,
-    };
+    let mut file = File::open(&path).map_err(|_err| ErrorKind::NotFound)?;
 
     let mut file_contents = String::new();
-    match file.read_to_string(&mut file_contents) {
-        Err(why) => panic!("couldn't read {}: {}", display, why),
-        Ok(_) => (),
-    }
+    file.read_to_string(&mut file_contents)
+        .map_err(|_err| ErrorKind::InvalidData)?;
 
     Ok(file_contents)
 }
