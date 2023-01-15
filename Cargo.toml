@@ -1,5 +1,5 @@
 [package]
-name = "leetcode-scrapper-rust"
+name = "leetcode_datahouse"
 version = "0.1.0"
 edition = "2021"
 
@@ -12,3 +12,5 @@ serde = { version = "1.0", features = ["derive"] }
 shellwords = "1.1.0"
 fred = "5.2.0"
 config = "0.13.2"
+diesel = { version = "2.0.2", features = ["postgres"]}
+dotenvy = "0.15.6"
