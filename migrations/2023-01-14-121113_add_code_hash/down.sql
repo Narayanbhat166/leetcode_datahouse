@@ -1,0 +1,1 @@
+ALTER TABLE submission DELETE COLUMN code_hash;
