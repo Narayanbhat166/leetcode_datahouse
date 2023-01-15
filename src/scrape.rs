@@ -107,8 +107,6 @@ pub async fn get_submission(
         }
       }"#;
 
-    let submission_id = "821085305";
-
     let mut body = std::collections::HashMap::new();
     let variables_body = &format!(" {{ \"submissionId\": {} }}", submission_id);
     body.insert("query", query);

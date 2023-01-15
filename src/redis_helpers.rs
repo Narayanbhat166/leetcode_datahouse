@@ -1,6 +1,5 @@
-use fred::prelude::*;
-use std::future::Future;
 use crate::configs::ConfigData;
+use fred::prelude::*;
 
 #[tokio::main]
 pub async fn create_client(config_data: ConfigData) -> Result<RedisClient, RedisError> {
@@ -35,6 +34,7 @@ pub async fn lock_submission_id(submission_id: String, client: RedisClient) -> O
             Some(SetOptions::NX),
             false,
         )
-        .await.unwrap();
+        .await
+        .unwrap();
     res
 }

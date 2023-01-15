@@ -1,5 +1,5 @@
 use shellwords;
-use std::collections::{self, HashMap};
+use std::collections::HashMap;
 use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
