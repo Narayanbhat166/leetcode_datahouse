@@ -36,32 +36,8 @@ pub struct NewSubmission {
     pub code_hash: String,
 }
 
-pub fn create_connection() -> PgConnection {
-    dotenv().ok();
-
-    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    PgConnection::establish(&database_url)
-        .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
-
-    // let new_submission = NewSubmission {
-    //     id: 2,
-    //     last_testcase: "None".to_string(),
-    //     memory: 1.0,
-    //     memory_display: "1.0".to_string(),
-    //     memory_percentile: 1.0,
-    //     notes: "Hello boi".to_string(),
-    //     runtime: 1.0,
-    //     runtime_percentile: 1.0,
-    //     status_code: 1,
-    //     timestamp: 1,
-    //     code_hash: "hash".to_string(),
-    // };
-
-    // let query = diesel::insert_into(submission::dsl::submission).values(new_submission);
-
-    // let res = query.get_result::<Submission>(&mut conn);
-
-    // println!("query res {:?}", res);
+pub fn create_connection(database_url: &str) -> Result<PgConnection, ConnectionError> {
+    PgConnection::establish(database_url)
 }
 
 pub fn insert_submission(

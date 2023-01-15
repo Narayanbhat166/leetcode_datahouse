@@ -4,4 +4,14 @@
 // submission id is not scrapped again by other producers
 // Lock feature is implemented using redis
 
-fn main() {}
+use leetcode_datahouse::{configs, database};
+
+fn main() {
+    let config = configs::read_config();
+    let db_conn = database::create_connection(&config.db.url).unwrap_or_else(|db_error| {
+        panic!(
+            "Could not establish connection to the database {}",
+            db_error
+        )
+    });
+}

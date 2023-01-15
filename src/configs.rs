@@ -17,16 +17,14 @@ pub struct RedisConfigData {
 
 #[derive(Deserialize, Debug)]
 pub struct DbConfigData {
-    
+    pub url: String,
 }
 
 pub fn read_config() -> ConfigData {
     let config_data = Config::builder()
-        .add_source(File::new("src/configs/Development.toml", FileFormat::Toml))
+        .add_source(File::new("src/Development.toml", FileFormat::Toml))
         .build();
 
-    let config: ConfigData = config_data.unwrap().try_deserialize().unwrap();
-    println!("{:?}", config);
-
-    config
+    // Unwrap here because without config application cannot be run
+    config_data.unwrap().try_deserialize().unwrap()
 }
