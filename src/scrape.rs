@@ -1,62 +1,17 @@
-use crate::curl_parser;
+use std::io::Read;
+
+use crate::{curl_parser, models};
 use reqwest::header::{self, HeaderMap, HeaderName, HeaderValue};
 use serde::{Deserialize, Serialize};
+use serde_json;
 
 const CSRF_COOKIE: &str = "csrftoken";
 const LEETCODE_SESSION_COOKIE: &str = "LEETCODE_SESSION";
 
-#[derive(Serialize, Deserialize, Debug)]
-#[serde(rename_all = "camelCase")]
-struct Profile {
-    real_name: String,
-    user_avatar: String,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-#[serde(rename_all = "camelCase")]
-struct User {
-    username: String,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-#[serde(rename_all = "camelCase")]
-struct Question {
-    question_id: String,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-#[serde(rename_all = "camelCase")]
-struct SubmissionDetails {
-    code: String,
-    last_testcase: String,
-    memory: f64,
-    memory_display: String,
-    memory_percentile: f64,
-    notes: String,
-    runtime: f64,
-    runtime_display: String,
-    runtime_percentile: f64,
-    status_code: i32,
-    timestamp: i64,
-    user: User,
-    question: Question,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct Details {
-    #[serde(rename = "submissionDetails")]
-    submission_details: SubmissionDetails,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct SubmissionResponse {
-    data: Details,
-}
-
-#[tokio::main]
-pub async fn get_submission(
-    submission_id: String,
-) -> Result<SubmissionResponse, Box<dyn std::error::Error>> {
+pub async fn scrape_submission(
+    submission_id: i32,
+) -> Result<models::ScrappedResponse, Box<dyn std::error::Error>> {
+    let submission_id_string = submission_id.to_string();
     let cookies = curl_parser::parse_curl();
     let url = "https://leetcode.com/graphql/";
     let csrf_header = HeaderName::from_static("x-csrftoken");
@@ -108,7 +63,7 @@ pub async fn get_submission(
       }"#;
 
     let mut body = std::collections::HashMap::new();
-    let variables_body = &format!(" {{ \"submissionId\": {} }}", submission_id);
+    let variables_body = &format!(" {{ \"submissionId\": {} }}", submission_id_string);
     body.insert("query", query);
     body.insert("variables", variables_body);
 
@@ -125,7 +80,9 @@ pub async fn get_submission(
     let request = client.post(url).headers(headers).json(&body);
     let resp = request.send().await?;
 
-    let parsed_resp = resp.json::<SubmissionResponse>().await?;
-
-    Ok(parsed_resp)
+    let submission_data = resp.json::<models::SubmissionResponse>().await?;
+    Ok(models::ScrappedResponse {
+        submission_id,
+        submission_data,
+    })
 }

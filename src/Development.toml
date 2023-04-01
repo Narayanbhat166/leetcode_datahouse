@@ -3,4 +3,4 @@ host = "localhost"
 port = 6379
 
 [db]
-url = "" 
+url = "postgres://mzkvdscp:9nCEZcnVgRdmIhwE2Bd4yN8MO8Pc5V-T@tiny.db.elephantsql.com/mzkvdscp" 

@@ -14,3 +14,5 @@ fred = "5.2.0"
 config = "0.13.2"
 diesel = { version = "2.0.2", features = ["postgres"]}
 dotenvy = "0.15.6"
+serde_json = "1.0.95"
+nutype = "0.1.1"
