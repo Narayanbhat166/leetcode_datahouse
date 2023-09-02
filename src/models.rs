@@ -1,4 +1,3 @@
-use nutype::nutype;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -11,20 +10,32 @@ pub struct Profile {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct User {
-    username: String,
+    pub username: String,
+    pub profile: UserProfile,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct UserProfile {
+    pub real_name: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Question {
-    question_id: String,
+    pub question_id: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct Language {
+    pub name: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct SubmissionDetails {
     pub code: Option<String>,
-    pub last_testcase: Option<String>,
     pub memory: Option<f32>,
     pub memory_display: Option<String>,
     pub memory_percentile: Option<f32>,
@@ -36,6 +47,7 @@ pub struct SubmissionDetails {
     pub timestamp: Option<i32>,
     pub user: Option<User>,
     pub question: Option<Question>,
+    pub lang: Option<Language>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -49,8 +61,8 @@ pub struct SubmissionResponse {
     pub data: Details,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ScrappedResponse {
-    pub submission_id: i32,
+    pub submission_id: u32,
     pub submission_data: SubmissionResponse,
 }

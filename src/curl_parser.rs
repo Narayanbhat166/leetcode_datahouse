@@ -7,7 +7,7 @@ use std::path::Path;
 fn read_file(file_name: String) -> Result<String, ErrorKind> {
     let path = Path::new(&file_name);
 
-    let mut file = File::open(&path).map_err(|_err| ErrorKind::NotFound)?;
+    let mut file = File::open(path).map_err(|_err| ErrorKind::NotFound)?;
 
     let mut file_contents = String::new();
     file.read_to_string(&mut file_contents)
@@ -24,13 +24,12 @@ pub fn parse_curl() -> HashMap<String, String> {
         .filter(|argument| argument.contains("cookie"))
         .collect::<Vec<&String>>();
 
-    let cookie = args.first().unwrap().splitn(2, ":").last().unwrap().trim();
+    let cookie = args.first().unwrap().splitn(2, ':').last().unwrap().trim();
     let cookie_vector = cookie
-        .split(";")
+        .split(';')
         .map(|ele| {
-            let res = ele.split("=").map(|ele| ele.trim()).collect::<Vec<&str>>();
-            let tuple = (res[0], res[1]);
-            tuple
+            let res = ele.split('=').map(|ele| ele.trim()).collect::<Vec<&str>>();
+            (res[0], res[1])
         })
         .collect::<Vec<(&str, &str)>>();
 

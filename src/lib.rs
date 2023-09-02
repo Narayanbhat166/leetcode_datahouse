@@ -7,3 +7,4 @@ pub mod redis_helpers;
 pub mod schema;
 pub mod scrape;
 pub mod transformers;
+pub mod utils;

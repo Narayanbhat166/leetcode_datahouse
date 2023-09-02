@@ -1,30 +1,50 @@
-// This service is supposed to scrape the data from leetcode and insert them into redis
-// There can be many producers which try to scrape different submission id
-// Lock should be acquired before scraping a submission id so that the same
-// submission id is not scrapped again by other producers
-// Lock feature is implemented using redis
+use leetcode_datahouse::scrape::scrape_submission;
 
-use leetcode_datahouse::{configs, database, models, scrape::scrape_submission};
+use controller_grpc::controller_client::ControllerClient;
+use controller_grpc::{GetSubmissionIdRequest, ScrappedResponse, StartScrapingRequest};
+
+pub mod controller_grpc {
+    // The string specified here must match the proto package name
+    tonic::include_proto!("controller");
+}
 
 #[tokio::main]
 async fn main() {
-    let config = configs::read_config();
-    let mut db_conn = database::create_connection(&config.db.url).unwrap_or_else(|db_error| {
-        panic!(
-            "Could not establish connection to the database {}",
-            db_error
-        )
-    });
+    let mut controller_server = ControllerClient::connect("http://[::1]:50051")
+        .await
+        .unwrap();
 
-    // Producer must get the submission id from the redis server, acquire the lock to it
-    // Scrape the data and then insert it back into redis queue.
+    loop {
+        // Producer must get the submission id from the redis server, acquire the lock to it
+        // Scrape the data and then insert it back into redis queue.
+        let submission_id = controller_server
+            .get_submission_id(GetSubmissionIdRequest {})
+            .await
+            .unwrap()
+            .into_inner()
+            .submission_id;
 
-    let submission_id = 925862080;
-    let scrapped_data = scrape_submission(submission_id).await.unwrap();
-    println!("{scrapped_data:?}");
+        let request = leetcode_datahouse::scrape::create_scrape_request(submission_id).unwrap();
 
-    let res =
-        database::insert_submission(database::NewSubmission::from(scrapped_data), &mut db_conn);
+        controller_server
+            .start_scraping(StartScrapingRequest { submission_id })
+            .await
+            .unwrap();
 
-    println!("Submission in database -> {:?}", res);
+        let scrapped_data = scrape_submission(request, submission_id).await.unwrap();
+
+        let stringified_data = serde_json::to_string(&scrapped_data).unwrap();
+
+        let grpc_request = ScrappedResponse {
+            submission_id,
+            data: stringified_data,
+        };
+
+        controller_server
+            .accept_scrapped_response(grpc_request)
+            .await
+            .unwrap();
+
+        println!("Saved to Db {submission_id}");
+    }
 }

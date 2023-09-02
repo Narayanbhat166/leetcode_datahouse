@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package controller;
+
+service Controller {
+    rpc AcceptScrappedResponse (ScrappedResponse) returns (StoreResult);
+    rpc GetSubmissionId(GetSubmissionIdRequest) returns (SubmissionIdResponse);
+    rpc StartScraping(StartScrapingRequest) returns (StartScrapingResponse);
+}
+
+message ScrappedResponse {
+    uint32 submission_id = 1;
+    string data = 2;
+}
+
+message StoreResult {
+    bool stored = 1;
+    optional string error = 2;
+}
+
+message GetSubmissionIdRequest {}
+
+message StartScrapingResponse {
+    bool no_objection = 1;
+}
+
+message StartScrapingRequest {
+    uint32 submission_id = 1;
+}
+
+message SubmissionIdResponse {
+    uint32 submission_id = 1;
+}
+
+
+
+
+

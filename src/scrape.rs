@@ -1,19 +1,19 @@
-use std::io::Read;
-
 use crate::{curl_parser, models};
-use reqwest::header::{self, HeaderMap, HeaderName, HeaderValue};
-use serde::{Deserialize, Serialize};
-use serde_json;
+use reqwest::{
+    header::{self, HeaderMap, HeaderName, HeaderValue},
+    RequestBuilder,
+};
 
 const CSRF_COOKIE: &str = "csrftoken";
 const LEETCODE_SESSION_COOKIE: &str = "LEETCODE_SESSION";
+const BASE_URL: &str = "https://leetcode.com/graphql/";
 
-pub async fn scrape_submission(
-    submission_id: i32,
-) -> Result<models::ScrappedResponse, Box<dyn std::error::Error>> {
+/// Takes the submission id and then return the request
+pub fn create_scrape_request(
+    submission_id: u32,
+) -> Result<RequestBuilder, Box<dyn std::error::Error>> {
     let submission_id_string = submission_id.to_string();
     let cookies = curl_parser::parse_curl();
-    let url = "https://leetcode.com/graphql/";
     let csrf_header = HeaderName::from_static("x-csrftoken");
     let csrf_token = cookies.get(CSRF_COOKIE).unwrap(); //FIXME: raise appropriate error and panic
     let session = cookies.get(LEETCODE_SESSION_COOKIE).unwrap(); //FIXME: raise appropriate error and panic
@@ -77,8 +77,15 @@ pub async fn scrape_submission(
     headers.insert(csrf_header, csrf_token.parse().unwrap());
 
     let client = reqwest::Client::new();
-    let request = client.post(url).headers(headers).json(&body);
-    let resp = request.send().await?;
+    let request = client.post(BASE_URL).headers(headers).json(&body);
+
+    Ok(request)
+}
+pub async fn scrape_submission(
+    request: RequestBuilder,
+    submission_id: u32,
+) -> Result<models::ScrappedResponse, Box<dyn std::error::Error>> {
+    let resp = request.send().await.unwrap();
 
     let submission_data = resp.json::<models::SubmissionResponse>().await?;
     Ok(models::ScrappedResponse {

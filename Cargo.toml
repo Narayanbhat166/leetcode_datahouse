@@ -12,7 +12,12 @@ serde = { version = "1.0", features = ["derive"] }
 shellwords = "1.1.0"
 fred = "5.2.0"
 config = "0.13.2"
-diesel = { version = "2.0.2", features = ["postgres"]}
+diesel = { version = "2.1.0", features = ["postgres"]}
 dotenvy = "0.15.6"
 serde_json = "1.0.95"
 nutype = "0.1.1"
+tonic = "0.7"
+prost = "0.10"
+
+[build-dependencies]
+tonic-build = "0.7"
