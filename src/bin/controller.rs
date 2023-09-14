@@ -95,16 +95,23 @@ impl Controller for MyController {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let addr = "[::1]:50051".parse()?;
+    env_logger::builder()
+        .filter_level(log::LevelFilter::Debug)
+        .format_target(true)
+        .init();
+
     let config = leetcode_datahouse::configs::read_config();
+    log::info!("Config Valid");
+
+    let bind_address = format!("{}:{}", config.controller.host, config.controller.port);
+    let addr = bind_address.parse()?;
 
     let redis_client = redis_helpers::create_redis_client(config.redis)
         .await
         .expect("Cannot establish redis connection");
 
     let controller = MyController::new(redis_client);
-
-    println!("Running the server on {:?}", addr);
+    log::info!("Running the server on {:?}", addr);
 
     Server::builder()
         .add_service(ControllerServer::new(controller))

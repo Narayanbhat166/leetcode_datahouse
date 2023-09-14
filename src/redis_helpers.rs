@@ -59,6 +59,23 @@ pub async fn mark_submission_id_as_scraping(
     Ok(())
 }
 
+pub async fn get_submission_from_list(
+    redis_client: RedisClient,
+) -> Result<Option<String>, RedisError> {
+    redis_client
+        .lrange::<Vec<String>, _>(consts::SUBMISSIONS_LIST, 0, 0)
+        .await
+        .map(|elements| elements.first().cloned())
+}
+
+pub async fn pop_submission_from_list(
+    redis_client: RedisClient,
+) -> Result<Option<String>, RedisError> {
+    redis_client
+        .lpop::<Option<String>, _>(consts::SUBMISSIONS_LIST, None)
+        .await
+}
+
 pub async fn get_next_submission_id(redis_client: &RedisClient) -> Result<u32, RedisError> {
     let submission_id_res = redis_client.incr::<u32, _>(consts::SUBMISSION_KEY).await;
 

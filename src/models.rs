@@ -66,3 +66,9 @@ pub struct ScrappedResponse {
     pub submission_id: u32,
     pub submission_data: SubmissionResponse,
 }
+
+impl ScrappedResponse {
+    pub fn contains_data(&self) -> bool {
+        self.submission_data.data.submission_details.is_some()
+    }
+}

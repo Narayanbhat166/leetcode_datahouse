@@ -5,6 +5,7 @@ use serde::Deserialize;
 pub struct ConfigData {
     pub redis: RedisConfigData,
     pub db: DbConfigData,
+    pub controller: Controller,
 }
 
 #[derive(Deserialize, Debug)]
@@ -13,6 +14,12 @@ pub struct RedisConfigData {
     pub host: String,
     pub port: u16,
     pub password: Option<String>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct Controller {
+    pub port: u16,
+    pub host: String,
 }
 
 #[derive(Deserialize, Debug)]

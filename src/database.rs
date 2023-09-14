@@ -1,6 +1,3 @@
-use std::fs::File;
-use std::io::Write;
-
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 
@@ -62,22 +59,6 @@ impl From<models::ScrappedResponse> for NewSubmission {
                     let code_hash =
                         utils::generate_hash(&submission_data.code.clone().unwrap_or_default());
                     let username = submission_data.user.map(|user| user.username);
-
-                    let language = submission_data
-                        .lang
-                        .map(|lang| lang.name)
-                        .unwrap_or("txt".to_string());
-
-                    let file_name =
-                        format!("submissions/{code_hash}_{}.{language}", item.submission_id);
-
-                    let mut file = File::create(file_name.clone())
-                        .expect(&format!("Unable to open file {file_name}"));
-
-                    submission_data
-                        .code
-                        .as_ref()
-                        .map(|code| file.write_all(code.as_bytes()));
 
                     let submission_id = i64::try_from(item.submission_id).unwrap();
 

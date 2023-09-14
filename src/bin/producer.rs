@@ -10,9 +10,13 @@ pub mod controller_grpc {
 
 #[tokio::main]
 async fn main() {
+    env_logger::init();
+
     let mut controller_server = ControllerClient::connect("http://[::1]:50051")
         .await
         .unwrap();
+
+    log::info!("Started Server");
 
     loop {
         // Producer must get the submission id from the redis server, acquire the lock to it
@@ -33,18 +37,22 @@ async fn main() {
 
         let scrapped_data = scrape_submission(request, submission_id).await.unwrap();
 
-        let stringified_data = serde_json::to_string(&scrapped_data).unwrap();
+        if scrapped_data.contains_data() {
+            let stringified_data = serde_json::to_string(&scrapped_data).unwrap();
 
-        let grpc_request = ScrappedResponse {
-            submission_id,
-            data: stringified_data,
-        };
+            let grpc_request = ScrappedResponse {
+                submission_id,
+                data: stringified_data,
+            };
 
-        controller_server
-            .accept_scrapped_response(grpc_request)
-            .await
-            .unwrap();
+            controller_server
+                .accept_scrapped_response(grpc_request)
+                .await
+                .unwrap();
 
-        println!("Saved to Db {submission_id}");
+            log::info!("Success {submission_id}");
+        } else {
+            log::warn!("No data present for submission_id {submission_id}");
+        }
     }
 }
