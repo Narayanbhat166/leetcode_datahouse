@@ -1,0 +1,29 @@
+[package]
+name    = "controller"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+reqwest      = { version = "0.11", features = [ "json" ] }
+tokio        = { version = "1", features = [ "full" ] }
+serde        = { version = "1.0", features = [ "derive" ] }
+shellwords   = "1.1.0"
+fred         = "6.3"
+config       = "0.13.2"
+diesel       = { version = "2.1.0", features = [ "postgres" ] }
+dotenvy      = "0.15.6"
+serde_json   = "1.0.95"
+nutype       = "0.1.1"
+tonic        = "0.7"
+prost        = "0.10"
+env_logger   = "0.10.0"
+log          = { version = "0.4.20", features = [ "max_level_info" ] }
+protobuffers = { path = "../protobuffers" }
+configs      = { path = "../configs" }
+redis        = { path = "../redis" }
+
+
+[build-dependencies]
+tonic-build = "0.7"
