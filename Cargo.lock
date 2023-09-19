@@ -237,10 +237,10 @@ dependencies = [
  "dotenvy",
  "env_logger",
  "fred",
+ "grpc",
  "log",
  "nutype",
  "prost",
- "protobuffers",
  "redis",
  "reqwest",
  "serde",
@@ -598,6 +598,28 @@ dependencies = [
  "cfg-if",
  "libc",
  "wasi",
+]
+
+[[package]]
+name = "grpc"
+version = "0.1.0"
+dependencies = [
+ "config",
+ "diesel",
+ "dotenvy",
+ "env_logger",
+ "fred",
+ "log",
+ "nutype",
+ "prost",
+ "redis",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "shellwords",
+ "tokio",
+ "tonic",
+ "tonic-build",
 ]
 
 [[package]]
@@ -1286,26 +1308,6 @@ checksum = "2d0a014229361011dc8e69c8a1ec6c2e8d0f2af7c91e3ea3f5b2170298461e68"
 dependencies = [
  "bytes",
  "prost",
-]
-
-[[package]]
-name = "protobuffers"
-version = "0.1.0"
-dependencies = [
- "config",
- "diesel",
- "dotenvy",
- "env_logger",
- "log",
- "nutype",
- "prost",
- "reqwest",
- "serde",
- "serde_json",
- "shellwords",
- "tokio",
- "tonic",
- "tonic-build",
 ]
 
 [[package]]

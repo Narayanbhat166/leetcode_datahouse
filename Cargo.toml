@@ -25,4 +25,4 @@ log        = { version = "0.4.20", features = [ "max_level_info" ] }
 tonic-build = "0.7"
 
 [workspace]
-members = [ "controller", "protobuffers", "configs", "redis" ]
+members = [ "controller", "grpc", "configs", "redis" ]
