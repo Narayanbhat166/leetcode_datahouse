@@ -1,5 +1,5 @@
 [package]
-name    = "leetcode_datahouse"
+name    = "grpc"
 version = "0.1.0"
 edition = "2021"
 
@@ -10,7 +10,6 @@ reqwest    = { version = "0.11", features = [ "json" ] }
 tokio      = { version = "1", features = [ "full" ] }
 serde      = { version = "1.0", features = [ "derive" ] }
 shellwords = "1.1.0"
-fred       = "6.3"
 config     = "0.13.2"
 diesel     = { version = "2.1.0", features = [ "postgres" ] }
 dotenvy    = "0.15.6"
@@ -20,9 +19,9 @@ tonic      = "0.7"
 prost      = "0.10"
 env_logger = "0.10.0"
 log        = { version = "0.4.20", features = [ "max_level_info" ] }
+fred       = "6.3.1"
+redis      = { path = "../redis" }
+
 
 [build-dependencies]
 tonic-build = "0.7"
-
-[workspace]
-members = [ "controller", "grpc", "configs", "redis" ]

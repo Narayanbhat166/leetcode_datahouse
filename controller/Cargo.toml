@@ -1,5 +1,5 @@
 [package]
-name    = "leetcode_datahouse"
+name    = "controller"
 version = "0.1.0"
 edition = "2021"
 
@@ -20,9 +20,10 @@ tonic      = "0.7"
 prost      = "0.10"
 env_logger = "0.10.0"
 log        = { version = "0.4.20", features = [ "max_level_info" ] }
+grpc       = { path = "../grpc" }
+configs    = { path = "../configs" }
+redis      = { path = "../redis" }
+
 
 [build-dependencies]
 tonic-build = "0.7"
-
-[workspace]
-members = [ "controller", "grpc", "configs", "redis" ]
