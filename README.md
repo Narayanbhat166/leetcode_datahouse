@@ -16,4 +16,4 @@ The communication between `Controller` and `Producer` happens by grpc.
 # Architecture
 ![alt architecture diagram][diagram]
 
-[diagram]: https://github.com/Narayanbhat166/lc-scrapper-rust/blob/main/architecture/leetcode_datahouse.png
+[diagram]: https://github.com/Narayanbhat166/leetcode_datahouse/assets/48803246/d0224a74-25a1-49df-b4fa-8fb37d6e8cc1
