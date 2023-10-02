@@ -1,4 +1,4 @@
 /target
-src/curl_request.sh
+src/*.sh
 .env
 migrations/.keep
