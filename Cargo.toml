@@ -20,9 +20,10 @@ tonic      = "0.7"
 prost      = "0.10"
 env_logger = "0.10.0"
 log        = { version = "0.4.20", features = [ "max_level_info" ] }
+error-stack = "0.4.1"
 
 [build-dependencies]
 tonic-build = "0.7"
 
 [workspace]
-members = [ "controller", "grpc", "configs", "redis" ]
+members = [ "controller", "grpc", "configs", "redis" , "producer", "errors"]
