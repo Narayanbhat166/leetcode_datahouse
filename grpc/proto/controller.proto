@@ -20,9 +20,7 @@ message StoreResult {
 
 message GetSubmissionIdRequest {}
 
-message StartScrapingResponse {
-    bool no_objection = 1;
-}
+message StartScrapingResponse {}
 
 message StartScrapingRequest {
     uint32 submission_id = 1;

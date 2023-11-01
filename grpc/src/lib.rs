@@ -5,38 +5,44 @@ pub use controller_grpc::{
 };
 
 use fred::prelude::RedisClient;
+use queues::Queue;
 
 pub mod controller_grpc {
     // The string specified here must match the proto package name
     tonic::include_proto!("controller");
 }
 
-pub struct MyController {
+pub struct MyController<T: Queue> {
     redis_client: RedisClient,
+    queue: T,
 }
 
-impl MyController {
-    pub fn new(redis_client: RedisClient) -> Self {
-        Self { redis_client }
+impl<T: Queue> MyController<T> {
+    pub fn new(redis_client: RedisClient, queue: T) -> Self
+    where
+        T: Queue,
+    {
+        Self {
+            redis_client,
+            queue,
+        }
     }
 }
 
 #[tonic::async_trait]
-impl Controller for MyController {
+impl<T: Send + Sync + Queue + 'static> Controller for MyController<T> {
     async fn accept_scrapped_response(
         &self,
         request: tonic::Request<ScrappedResponse>, // Accept request of type HelloRequest
     ) -> Result<tonic::Response<StoreResult>, tonic::Status> {
-        println!("Got a request: {:?}", request);
+        println!("Got a submission request: {:?}", request);
 
         let scrapped_response = request.into_inner();
 
-        let insert_submission_result = redis::insert_submission_into_queue(
-            &self.redis_client,
-            scrapped_response.submission_id,
-            scrapped_response.data,
-        )
-        .await;
+        let insert_submission_result = self
+            .queue
+            .push(consts::SUBMISSIONS_LIST, &scrapped_response.data)
+            .await;
 
         let response = match insert_submission_result {
             Ok(_) => StoreResult {
@@ -71,20 +77,6 @@ impl Controller for MyController {
     ) -> Result<tonic::Response<StartScrapingResponse>, tonic::Status> {
         println!("Got a request: {:?}", request);
 
-        let request = request.into_inner();
-
-        let submission_id =
-            redis::mark_submission_id_as_scraping(&self.redis_client, request.submission_id).await;
-
-        match submission_id {
-            Ok(_) => Ok(tonic::Response::new(StartScrapingResponse {
-                no_objection: true,
-            })),
-            //FIXME: Send error message
-            Err(_) => Err(tonic::Status::new(
-                tonic::Code::Ok,
-                "ALready being scrapped",
-            )),
-        }
+        Ok(tonic::Response::new(StartScrapingResponse {}))
     }
 }

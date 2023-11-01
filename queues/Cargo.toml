@@ -1,11 +1,15 @@
 [package]
-name = "errors"
+name = "queues"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-serde_json = "1.0.108"
-thiserror = "1.0.50"
+async-trait = "0.1.74"
+serde = { version = "1.0.190", features = ["derive"] }
+
+errors = {path = "../errors"}
 fred = "6"
+serde_json = "1.0.108"
+error-stack = "0.4.1"

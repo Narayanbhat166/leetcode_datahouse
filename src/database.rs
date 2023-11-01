@@ -1,8 +1,8 @@
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 
+use crate::models;
 use crate::schema::submission;
-use crate::{models, utils};
 
 #[derive(Queryable, Debug)]
 pub struct Submission {

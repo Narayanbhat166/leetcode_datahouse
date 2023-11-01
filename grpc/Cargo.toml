@@ -21,6 +21,8 @@ env_logger = "0.10.0"
 log        = { version = "0.4.20", features = [ "max_level_info" ] }
 fred       = "6.3.1"
 redis      = { path = "../redis" }
+queues = {path = "../queues"}
+consts = {path = "../consts"}
 
 
 [build-dependencies]

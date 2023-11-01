@@ -23,6 +23,7 @@ log        = { version = "0.4.20", features = [ "max_level_info" ] }
 grpc       = { path = "../grpc" }
 configs    = { path = "../configs" }
 redis      = { path = "../redis" }
+queues = { path = "../queues" }
 
 
 [build-dependencies]

@@ -25,5 +25,17 @@ async fn main() {
         .submission_id;
 
     let extractor = Leetcode;
-    dbg!(extractor.fetch_data(submission_id).await);
+    let data = extractor.fetch_data(submission_id).await;
+
+    if let Ok(scrapped_response) = data {
+        let stringified_response = serde_json::to_string(&scrapped_response).unwrap();
+        let scrapped_request = grpc::ScrappedResponse {
+            submission_id,
+            data: stringified_response,
+        };
+        controller_server
+            .accept_scrapped_response(scrapped_request)
+            .await
+            .unwrap();
+    }
 }
