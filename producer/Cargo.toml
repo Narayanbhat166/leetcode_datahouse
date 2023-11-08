@@ -16,3 +16,6 @@ grpc = {path = "../grpc"}
 errors = {path = "../errors"}
 error-stack = "0.4.1"
 serde_json = "1.0.108"
+models = {path = "../models"}
+env_logger = "0.10.0"
+log = "0.4.20"

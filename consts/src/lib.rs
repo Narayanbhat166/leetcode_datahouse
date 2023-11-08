@@ -2,6 +2,7 @@ pub const SUBMISSION_KEY: &str = "submission_id";
 pub const SUBMISSIONS_LIST: &str = "submissions";
 pub const SCRAPPING_SET: &str = "currently_scrapping";
 pub const DEFAULT_START_SUBMISSION_ID: u32 = 1223456789;
+pub const DEAD_LETTER_QUEUE: &str = "dead_letter_queue";
 
 pub const CSRF_COOKIE: &str = "csrftoken";
 pub const LEETCODE_SESSION_COOKIE: &str = "LEETCODE_SESSION";

@@ -3,7 +3,7 @@ use diesel::{Connection, ConnectionError, PgConnection, RunQueryDsl};
 pub fn create_connection(
     db_config: configs::types::DbConfigData,
 ) -> Result<PgConnection, ConnectionError> {
-    PgConnection::establish(&db_config.url)
+    PgConnection::establish(&db_config.db.url)
 }
 
 pub fn insert_submission(

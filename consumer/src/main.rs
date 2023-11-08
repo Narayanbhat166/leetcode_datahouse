@@ -21,5 +21,5 @@ async fn main() {
         client: redis_client,
     };
 
-    looper::loop_and_poop(redis_queue).await;
+    looper::loop_and_poop(redis_queue).await.unwrap();
 }

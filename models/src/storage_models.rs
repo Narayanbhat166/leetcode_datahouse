@@ -1,7 +1,5 @@
-use diesel::pg::PgConnection;
-use diesel::prelude::*;
-
 use crate::schema;
+use diesel::{ConnectionError, Insertable, PgConnection, Queryable, RunQueryDsl};
 
 #[derive(Queryable, Debug)]
 pub struct Submission {
@@ -37,7 +35,7 @@ pub struct NewSubmission {
 }
 
 pub fn create_connection(database_url: &str) -> Result<PgConnection, ConnectionError> {
-    PgConnection::establish(database_url)
+    <PgConnection as diesel::Connection>::establish(database_url)
 }
 
 pub fn insert_submission(
@@ -45,7 +43,7 @@ pub fn insert_submission(
     conn: &mut PgConnection,
 ) -> Result<Submission, diesel::result::Error> {
     let query = diesel::insert_into(schema::submission::dsl::submission).values(new_submission);
-    query.get_result::<Submission>(conn)
+    query.get_result(conn)
 }
 
 impl From<crate::api_models::ScrappedResponse> for NewSubmission {

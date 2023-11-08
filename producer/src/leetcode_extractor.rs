@@ -1,4 +1,4 @@
-use crate::{consts, extractor::Extractor, storage_models};
+use crate::{consts, extractor::Extractor};
 use errors;
 
 use reqwest::{
@@ -56,14 +56,14 @@ pub fn create_scrape_request(
 pub async fn scrape_submission(
     request: RequestBuilder,
     submission_id: u32,
-) -> Result<crate::storage_models::ScrappedResponse, errors::producer::ExtractorError> {
+) -> Result<models::api_models::ScrappedResponse, errors::producer::ExtractorError> {
     let resp = request.send().await.unwrap();
 
     let submission_data = resp
-        .json::<crate::storage_models::SubmissionResponse>()
+        .json::<models::api_models::SubmissionResponse>()
         .await
         .unwrap();
-    Ok(crate::storage_models::ScrappedResponse {
+    Ok(models::api_models::ScrappedResponse {
         submission_id,
         submission_data,
     })
@@ -72,11 +72,11 @@ pub async fn scrape_submission(
 pub struct Leetcode;
 
 #[async_trait::async_trait]
-impl Extractor<u32, storage_models::ScrappedResponse> for Leetcode {
+impl Extractor<u32, models::api_models::ScrappedResponse> for Leetcode {
     async fn fetch_data(
         &self,
         id: u32,
-    ) -> Result<storage_models::ScrappedResponse, errors::producer::ExtractorError> {
+    ) -> Result<models::api_models::ScrappedResponse, errors::producer::ExtractorError> {
         let scrape_request = create_scrape_request(id)?;
         scrape_submission(scrape_request, id).await
     }

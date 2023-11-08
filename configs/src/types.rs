@@ -38,6 +38,11 @@ impl Controller {
 }
 
 #[derive(Deserialize, Debug)]
-pub struct DbConfigData {
+pub struct Db {
     pub url: String,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct DbConfigData {
+    pub db: Db,
 }

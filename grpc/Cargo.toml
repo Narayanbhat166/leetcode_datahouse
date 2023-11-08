@@ -23,6 +23,7 @@ fred       = "6.3.1"
 redis      = { path = "../redis" }
 queues = {path = "../queues"}
 consts = {path = "../consts"}
+models = { path = "../models" }
 
 
 [build-dependencies]

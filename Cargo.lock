@@ -720,6 +720,7 @@ dependencies = [
  "env_logger",
  "fred 6.3.1",
  "log",
+ "models",
  "nutype",
  "prost",
  "queues",
@@ -1398,9 +1399,12 @@ name = "producer"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "env_logger",
  "error-stack",
  "errors",
  "grpc",
+ "log",
+ "models",
  "reqwest",
  "serde",
  "serde_json",
