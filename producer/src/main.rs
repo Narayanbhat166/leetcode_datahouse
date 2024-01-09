@@ -1,3 +1,4 @@
+use env_logger;
 use error_stack::ResultExt;
 use producer::extractor::Extractor;
 use producer::leetcode_extractor::Leetcode;
@@ -6,6 +7,11 @@ use grpc;
 
 #[tokio::main]
 async fn main() {
+    env_logger::builder()
+        .filter_level(log::LevelFilter::Debug)
+        .format_target(true)
+        .init();
+
     let mut controller_server =
         grpc::controller_grpc::controller_client::ControllerClient::connect(
             "http://127.0.0.1:6969",
@@ -13,6 +19,8 @@ async fn main() {
         .await
         .change_context(errors::grpc::GrpcClientError::ConnectionToServerFailed)
         .unwrap();
+
+    log::info!("Established connection to controller");
 
     // Producer must get the submission id from the redis server, acquire the lock to it
     // Scrape the data and then insert it back into redis queue.
@@ -24,6 +32,20 @@ async fn main() {
         .into_inner()
         .submission_id;
 
+    log::info!("Scraping submission id {submission_id}");
+
     let extractor = Leetcode;
-    dbg!(extractor.fetch_data(submission_id).await);
+    let data = extractor.fetch_data(submission_id).await;
+
+    if let Ok(scrapped_response) = data {
+        let stringified_response = serde_json::to_string(&scrapped_response).unwrap();
+        let scrapped_request = grpc::ScrappedResponse {
+            submission_id,
+            data: stringified_response,
+        };
+        controller_server
+            .accept_scrapped_response(scrapped_request)
+            .await
+            .unwrap();
+    }
 }

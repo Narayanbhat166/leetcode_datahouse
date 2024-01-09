@@ -1,5 +1,5 @@
 use configs::types::Redis;
-mod consts;
+use consts;
 
 use fred::prelude::*;
 

@@ -1,8 +1,8 @@
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 
+use crate::models;
 use crate::schema::submission;
-use crate::{models, utils};
 
 #[derive(Queryable, Debug)]
 pub struct Submission {
@@ -56,8 +56,8 @@ impl From<models::ScrappedResponse> for NewSubmission {
                 .data
                 .submission_details
                 .map(|submission_data| {
-                    let code_hash =
-                        utils::generate_hash(&submission_data.code.clone().unwrap_or_default());
+                    let code_hash = None;
+                    // utils::generate_hash(&submission_data.code.clone().unwrap_or_default());
                     let username = submission_data.user.map(|user| user.username);
 
                     let submission_id = i64::try_from(item.submission_id).unwrap();
@@ -72,7 +72,7 @@ impl From<models::ScrappedResponse> for NewSubmission {
                         runtime_percentile: submission_data.runtime_percentile,
                         status_code: submission_data.status_code,
                         timestamp: submission_data.timestamp,
-                        code_hash: Some(code_hash),
+                        code_hash,
                         username,
                         question_id: submission_data
                             .question

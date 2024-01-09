@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 fred    = "6.3"
 configs = { path = "../configs" }
+consts = { path = "../consts" }

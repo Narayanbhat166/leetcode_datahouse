@@ -53,7 +53,7 @@ pub struct SubmissionDetails {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Details {
     #[serde(rename = "submissionDetails")]
-    pub submission_details: Option<SubmissionDetails>,
+    pub submission_details: SubmissionDetails,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -65,10 +65,4 @@ pub struct SubmissionResponse {
 pub struct ScrappedResponse {
     pub submission_id: u32,
     pub submission_data: SubmissionResponse,
-}
-
-impl ScrappedResponse {
-    pub fn contains_data(&self) -> bool {
-        self.submission_data.data.submission_details.is_some()
-    }
 }

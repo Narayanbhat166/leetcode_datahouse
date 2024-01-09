@@ -1,3 +1,4 @@
+use queues::redis::RedisQueue;
 use redis;
 
 use grpc::{ControllerServer, MyController};
@@ -19,7 +20,11 @@ pub async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
         .await
         .expect("Cannot establish redis connection");
 
-    let controller = MyController::new(redis_client);
+    let redis_queue = RedisQueue {
+        client: redis_client.clone(),
+    };
+
+    let controller = MyController::new(redis_client, redis_queue);
     log::info!("Running the server on {:?}", addr);
 
     tonic::transport::Server::builder()

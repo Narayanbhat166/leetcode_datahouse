@@ -4,49 +4,71 @@ pub use controller_grpc::{
     StoreResult, SubmissionIdResponse,
 };
 
-use fred::prelude::RedisClient;
+use fred::prelude::{ListInterface, RedisClient};
+use queues::Queue;
 
 pub mod controller_grpc {
     // The string specified here must match the proto package name
     tonic::include_proto!("controller");
 }
 
-pub struct MyController {
+pub struct MyController<T: Queue> {
     redis_client: RedisClient,
+    queue: T,
 }
 
-impl MyController {
-    pub fn new(redis_client: RedisClient) -> Self {
-        Self { redis_client }
+impl<T: Queue> MyController<T> {
+    pub fn new(redis_client: RedisClient, queue: T) -> Self
+    where
+        T: Queue,
+    {
+        Self {
+            redis_client,
+            queue,
+        }
     }
 }
 
 #[tonic::async_trait]
-impl Controller for MyController {
+impl<T: Send + Sync + Queue + 'static> Controller for MyController<T> {
     async fn accept_scrapped_response(
         &self,
         request: tonic::Request<ScrappedResponse>, // Accept request of type HelloRequest
     ) -> Result<tonic::Response<StoreResult>, tonic::Status> {
-        println!("Got a request: {:?}", request);
+        println!("Got a submission request: {:?}", request);
 
         let scrapped_response = request.into_inner();
+        let parsed_submission_details =
+            serde_json::from_str::<models::api_models::ScrappedResponse>(&scrapped_response.data);
 
-        let insert_submission_result = redis::insert_submission_into_queue(
-            &self.redis_client,
-            scrapped_response.submission_id,
-            scrapped_response.data,
-        )
-        .await;
+        let response = if let Err(error_details) = parsed_submission_details {
+            let res = self
+                .redis_client
+                .lpush::<u32, &str, _>(consts::DEAD_LETTER_QUEUE, scrapped_response.submission_id)
+                .await
+                .unwrap();
+            println!("{res:?}");
+            StoreResult {
+                stored: false,
+                error: Some(error_details.to_string()),
+            }
+        } else {
+            let insert_submission_result = self
+                .queue
+                .push(consts::SUBMISSIONS_LIST, &scrapped_response.data)
+                .await;
 
-        let response = match insert_submission_result {
-            Ok(_) => StoreResult {
-                stored: true,
-                error: None,
-            },
-            Err(error) => StoreResult {
-                stored: true,
-                error: Some(error.to_string()),
-            },
+            let response = match insert_submission_result {
+                Ok(_) => StoreResult {
+                    stored: true,
+                    error: None,
+                },
+                Err(error) => StoreResult {
+                    stored: true,
+                    error: Some(error.to_string()),
+                },
+            };
+            response
         };
 
         Ok(tonic::Response::new(response))
@@ -56,7 +78,24 @@ impl Controller for MyController {
         &self,
         request: tonic::Request<GetSubmissionIdRequest>,
     ) -> Result<tonic::Response<SubmissionIdResponse>, tonic::Status> {
-        println!("Got a request: {:?}", request);
+        println!(
+            "Received a request for new submission scraping {:?}",
+            request
+        );
+
+        println!("Checking dead letter queue for failed submissions");
+
+        let submission_id = self
+            .redis_client
+            .lrange::<Vec<u32>, _>(consts::DEAD_LETTER_QUEUE, 0, 1)
+            .await
+            .unwrap();
+
+        if submission_id.len() == 0 {
+            println!("No submissions in dlq");
+        } else {
+            println!("Submissions found in dlq");
+        }
 
         let submission_id = redis::get_next_submission_id(&self.redis_client)
             .await
@@ -71,20 +110,6 @@ impl Controller for MyController {
     ) -> Result<tonic::Response<StartScrapingResponse>, tonic::Status> {
         println!("Got a request: {:?}", request);
 
-        let request = request.into_inner();
-
-        let submission_id =
-            redis::mark_submission_id_as_scraping(&self.redis_client, request.submission_id).await;
-
-        match submission_id {
-            Ok(_) => Ok(tonic::Response::new(StartScrapingResponse {
-                no_objection: true,
-            })),
-            //FIXME: Send error message
-            Err(_) => Err(tonic::Status::new(
-                tonic::Code::Ok,
-                "ALready being scrapped",
-            )),
-        }
+        Ok(tonic::Response::new(StartScrapingResponse {}))
     }
 }
